@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Prediksi Energi Industri Baja</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+  <div class="container">
+    <h1>🔮 Prediksi Konsumsi Energi Industri Baja</h1>
+
+    <p class="desc">
+      <strong>Mata Kuliah:</strong> Machine Learning<br>
+      <strong>Kelas:</strong> C<br>
+      <strong>Metode:</strong> Random Forest Classifier<br><br>
+      <strong>Kelompok 3:</strong><br>
+      Christina Michela Nanda E.K. (1462300042)<br>
+      Natasya Exelia P.T. (1462300124)<br>
+      Bunga Anggraini (1462300140)<br>
+      Neoriztinah Ratu Violiny (1462400142)
+    </p>
+
+    <form id="predictionForm">
+      <div class="form-row">
+        <label>Hour</label>
+        <input type="number" name="Hour" required>
+      </div>
+      <div class="form-row">
+        <label>Day</label>
+        <input type="number" name="Day" required>
+      </div>
+      <div class="form-row">
+        <label>Month</label>
+        <input type="number" name="Month" required>
+      </div>
+      <div class="form-row">
+        <label>Lagging Current Reactive Power (kVarh)</label>
+        <input type="number" step="any" name="Lagging_Current_Reactive.Power_kVarh" required>
+      </div>
+      <div class="form-row">
+        <label>Leading Current Reactive Power (kVarh)</label>
+        <input type="number" step="any" name="Leading_Current_Reactive_Power_kVarh" required>
+      </div>
+      <div class="form-row">
+        <label>CO2 (tCO2)</label>
+        <input type="number" step="any" name="CO2(tCO2)" required>
+      </div>
+      <div class="form-row">
+        <label>NSM</label>
+        <input type="number" step="any" name="NSM" required>
+      </div>
+      <div class="form-row">
+        <label>Lagging Power Factor</label>
+        <input type="number" step="any" name="Lagging_Current_Power_Factor" required>
+      </div>
+      <div class="form-row">
+        <label>Leading Power Factor</label>
+        <input type="number" step="any" name="Leading_Current_Power_Factor" required>
+      </div>
+      <div class="form-row">
+        <label>Week Status</label>
+        <select name="WeekStatus" required>
+          <option value="Weekday">Weekday</option>
+          <option value="Weekend">Weekend</option>
+        </select>
+      </div>
+      <div class="form-row">
+        <label>Day of Week</label>
+        <select name="Day_of_week" required>
+          <option value="Sunday">Sunday</option>
+          <option value="Monday">Monday</option>
+          <option value="Tuesday">Tuesday</option>
+          <option value="Wednesday">Wednesday</option>
+          <option value="Thursday">Thursday</option>
+          <option value="Friday">Friday</option>
+          <option value="Saturday">Saturday</option>
+        </select>
+      </div>
+      <div class="form-row">
+        <label>Load Type</label>
+        <select name="Load_Type" required>
+          <option value="Light">Light</option>
+          <option value="Medium">Medium</option>
+          <option value="Maximum">Maximum</option>
+        </select>
+      </div>
+      <button type="button" onclick="predict()">Prediksi</button>
+    </form>
+
+    <div id="result"></div>
+  </div>
+
+  <script>
+    function predict() {
+      const form = document.getElementById("predictionForm");
+      const formData = new FormData(form);
+      let data = {};
+      for (let [key, value] of formData.entries()) {
+        data[key] = value;
+      }
+
+      fetch("/predict", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data)
+      })
+        .then(response => response.json())
+        .then(result => {
+          const el = document.getElementById("result");
+          if (result.prediksi) {
+            el.innerHTML = `<span class="label">Hasil Prediksi:</span> <span class="value ${result.prediksi.toLowerCase()}">${result.prediksi}</span>`;
+          } else {
+            el.innerText = "❌ " + (result.error || "Terjadi kesalahan.");
+          }
+        })
+        .catch(error => {
+          document.getElementById("result").innerText = "Gagal terhubung ke server.";
+          console.error(error);
+        });
+    }
+  </script>
+</body>
+</html>
