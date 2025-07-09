@@ -7,7 +7,7 @@ app = Flask(__name__)
 # Load model
 model = joblib.load("RFModel.pkl")
 
-# Semua fitur yang digunakan saat training (18 kolom)
+# Semua fitur yang digunakan saat training
 all_features = [
     'Hour', 'Day', 'Month', 'NSM',
     'Lagging_Current_Reactive.Power_kVarh',
@@ -62,7 +62,6 @@ def predict():
             row["Load_Type_Maximum_Load"] = 1
         elif load == "Medium":
             row["Load_Type_Medium_Load"] = 1
-        # Light → biarkan dua dummy = 0
 
         # Buat DataFrame & URUTKAN kolom
         df = pd.DataFrame([row])
@@ -77,4 +76,6 @@ def predict():
         return jsonify({"error": str(e)}), 400
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    import os
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host="0.0.0.0", port=port)
